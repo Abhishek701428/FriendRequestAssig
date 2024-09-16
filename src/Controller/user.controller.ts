@@ -9,6 +9,14 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Signup
 export const signup = async (req: Request, res: Response) => {
   const { username, password } = req.body;
+
+  // Check if the username already exists
+  const existingUser = await User.findOne({ username });
+  if (existingUser) {
+    return res.status(400).json({ message: 'Username already taken' });
+  }
+
+  // Hash the password and create a new user
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({ username, password: hashedPassword });
   await user.save();
